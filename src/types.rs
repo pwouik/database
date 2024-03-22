@@ -1,3 +1,5 @@
+use std::any::TypeId;
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum DataType {
     Byte,
@@ -8,20 +10,7 @@ pub enum DataType {
     Double,
     String(u8),
 }
-fn ensure_16bit_boundaries(mut s:u32)->u32{
-    if s<16 {
-        s-=1;
-        s|=s>>1;
-        s|=s>>2;
-        s|=s>>4;
-        s|=s>>8;
-        s+1
-    }
-    else{
-        (s + 15) & !15
-    }
-}
-pub fn type_id(t: DataType) -> u8 {
+pub fn as_byte(t: DataType) -> u8 {
     match t {
         DataType::Byte => 1,
         DataType::Short => 2,
@@ -32,6 +21,7 @@ pub fn type_id(t: DataType) -> u8 {
         DataType::String(_) => 7,
     }
 }
+
 pub fn type_size(t: DataType) -> u32 {
     match t {
         DataType::Byte => 1,
@@ -40,6 +30,17 @@ pub fn type_size(t: DataType) -> u32 {
         DataType::Long => 8,
         DataType::Float => 4,
         DataType::Double => 8,
-        DataType::String(size) => ensure_16bit_boundaries(size as u32 + 1),
+        DataType::String(size) => size as u32 + 1,
+    }
+}
+pub fn type_id(t: DataType) -> TypeId {
+    match t {
+        DataType::Byte => TypeId::of::<u8>(),
+        DataType::Short => TypeId::of::<i16>(),
+        DataType::Int => TypeId::of::<i32>(),
+        DataType::Long => TypeId::of::<i64>(),
+        DataType::Float => TypeId::of::<f32>(),
+        DataType::Double => TypeId::of::<f64>(),
+        DataType::String(_) => TypeId::of::<String>(),
     }
 }

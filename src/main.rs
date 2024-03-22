@@ -1,28 +1,22 @@
 mod column;
 mod database;
-mod param;
 mod schema;
-mod value_ref;
 mod table;
 mod types;
+mod index;
+mod row_set;
+mod btree_index;
+mod array_column;
+mod codec;
 
 use crate::database::Database;
-use crate::types::DataType;
 use crate::schema::Schema;
+use crate::types::DataType;
+
 fn main() {
-    let mut db = Database::new("db");
-    db.add_table(
-        "people",
-        Schema::new()
-            .table("name", DataType::String(100))
-            .table("age", DataType::Short)
-    );
-
-    db.insert("people", vec!["john".into(), (&25i16).into()]);
-
-    let mut r = db.select("people", 0);
-
-    println!("name: {}", String::from(r.remove(0)));
-    println!("age: {}", i16::from(r.remove(0)));
-    db.persist();
+    let mut db = Database::open("db");
+    let mut r = db.get("people",0);
+    println!("name: {}",r.remove(0).downcast::<String>().unwrap());
+    println!("age: {}", r.remove(0).downcast::<i16>().unwrap());
+    db.commit();
 }
