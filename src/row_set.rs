@@ -1,3 +1,3 @@
-pub struct RowSet{
-    set:Vec<u64>
+pub struct RowSet {
+    set: Vec<u64>,
 }
